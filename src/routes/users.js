@@ -20,4 +20,12 @@ router.get('/:project', verifyCache, async (req, res) => {
     .catch((error) => res.json({ message: error }));
 });
 
+router.delete('/:id', verifyCache, async (req, res) => {
+  const { id } = req.params;
+  userSchema
+    .deleteOne({ _id: id })
+    .then((data) => res.json(data))
+    .catch((error) => res.json({ message: error }));
+});
+
 module.exports = router;
