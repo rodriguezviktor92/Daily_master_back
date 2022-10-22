@@ -1,50 +1,52 @@
 const router = require('express').Router();
 const { cache, verifyCache } = require('./cache');
-const projectsSchema = require('../models/projects');
 const eventsSchema = require('../models/events');
 
 router.post('/', verifyCache, async (req, res) => {
-  const project = projectsSchema(req.body);
+  const events = eventsSchema(req.body);
 
-  const dataEvents = {
-    project: project.name,
-    events: [],
-  };
-
-  const events = eventsSchema(dataEvents);
-
-  // change to promiseAlls
-  project
+  events
     .save()
-    .then(() => {
-      events
-        .save()
-        .then((data) => res.json(data))
-        .catch((error) => res.json({ message: error }));
-    })
+    .then((data) => res.json(data))
     .catch((error) => res.json({ message: error }));
 });
 
+// Eliminar
 router.get('/', verifyCache, async (req, res) => {
-  projectsSchema
+  eventsSchema
     .find()
     .then((data) => res.json(data))
     .catch((error) => res.json({ message: error }));
 });
 
-router.get('/:id', verifyCache, async (req, res) => {
-  const { id } = req.params;
+router.get('/:project', verifyCache, async (req, res) => {
+  const { project } = req.params;
 
-  projectsSchema
-    .find({ _id: id })
+  eventsSchema
+    .find({ project })
     .then((data) => res.json(data))
     .catch((error) => res.json({ message: error }));
 });
 
 router.delete('/:id', verifyCache, async (req, res) => {
   const { id } = req.params;
-  projectsSchema
+
+  eventsSchema
     .deleteOne({ _id: id })
+    .then((data) => res.json(data))
+    .catch((error) => res.json({ message: error }));
+});
+
+router.put('/:id', verifyCache, async (req, res) => {
+  const { id } = req.params;
+  const events = req.body;
+
+  eventsSchema
+    .updateOne({ _id: id }, {
+      $set: {
+        events,
+      },
+    })
     .then((data) => res.json(data))
     .catch((error) => res.json({ message: error }));
 });
